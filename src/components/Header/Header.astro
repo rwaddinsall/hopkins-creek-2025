@@ -1,0 +1,91 @@
+---
+const pages = [
+  { name: "Info", href: "/info" },
+  { name: "Applications", href: "/applications" },
+  { name: "Sustainability", href: "/sustainability" },
+  { name: "Tickets", href: "/tickets", primary: true },
+];
+---
+
+<!-- Skip link for improved keyboard navigation -->
+<a href="#main-content" class="sr-only focus:not-sr-only"
+  >Skip to main content</a
+>
+
+<header id="main-navigation" class="py-4">
+  <div class="container mx-auto flex items-center justify-between px-4">
+    <!-- Logo -->
+    <a
+      href="/"
+      class="btn btn-ghost normal-case text-xl"
+      aria-label="Hopkins Creek home"
+    >
+      Hopkins Creek
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav class="hidden lg:block" aria-label="Main navigation desktop">
+      <ul class="menu menu-horizontal space-x-4">
+        {
+          pages.map((page) => (
+            <li>
+              <a href={page.href} class="btn btn-ghost">
+                {page.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <!-- Mobile menu toggle -->
+    <button
+      class="btn btn-ghost lg:hidden responsive-toggle"
+      aria-expanded="false"
+      aria-label="Open menu navigation"
+    >
+      <span>Menu</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6 ml-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M2 1.667h24m-24 8h24m-24 8h24"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile navigation -->
+  <nav class="mobile-menu hidden lg:hidden" aria-label="Main navigation mobile">
+    <ul class="menu menu-vertical space-y-2 p-4">
+      {
+        pages.map((page) => (
+          <li>
+            <a href={page.href} class="btn btn-ghost w-full">
+              {page.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <script>
+    document.addEventListener("astro:page-load", () => {
+      const toggle = document.querySelector(".responsive-toggle");
+      const mobileNav = document.querySelector(".mobile-menu");
+      if (!toggle || !mobileNav) return;
+      toggle.addEventListener("click", () => {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        mobileNav.classList.toggle("hidden");
+      });
+    });
+  </script>
+</header>

@@ -1,0 +1,18 @@
+---
+import fetchApi from "../../lib/strapi";
+
+interface Artist {
+  id?: number;
+  name: string;
+  // Add other properties your artists have
+}
+
+const artists = (await fetchApi({
+  endpoint: "artists",
+  wrappedByKey: "data",
+})) as Artist[];
+---
+
+<ul>
+  {artists.map((artist) => <li>{artist.name}</li>)}
+</ul>

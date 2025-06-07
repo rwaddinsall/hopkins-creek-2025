@@ -1,0 +1,49 @@
+---
+import Accordion from "./Accordion.astro";
+import RichTextRenderer from "../RichTextRenderer.astro";
+
+interface AccordionItem {
+  title: string;
+  content: string;
+}
+
+interface Block {
+  type: string;
+  children?: any[];
+  level?: number;
+  format?: string;
+  [key: string]: any;
+}
+
+interface InfoSectionProps {
+  title: string;
+  items: AccordionItem[];
+  description?: Block[];
+  groupName?: string;
+}
+
+const {
+  title,
+  items = [],
+  description,
+  groupName = "info-section",
+} = Astro.props as InfoSectionProps;
+---
+
+<section class="mb-8">
+  <h2 class="text-2xl font-bold mb-4 text-center sm:text-left">{title}</h2>
+
+  {
+    description && description.length > 0 && (
+      <div class="mb-6">
+        <RichTextRenderer blocks={description} className="rich-text" />
+      </div>
+    )
+  }
+
+  <Accordion
+    items={items}
+    groupName={groupName}
+    className="shadow-md rounded-lg"
+  />
+</section>

@@ -1,0 +1,80 @@
+---
+import Layout from "../layouts/Layout.astro";
+import InfoSection from "../components/UI/Info-section/InfoSection.astro";
+import fetchApi from "../lib/strapi";
+
+// Fetch sustainability data from Strapi
+const sustainabilityData = await fetchApi({
+  endpoint: "sustainabilities",
+  query: {
+    populate: "accordions",
+    sort: "order:asc",
+  },
+  wrappedByKey: "data",
+});
+
+// Group data by category
+const groupedData = {};
+if (sustainabilityData && Array.isArray(sustainabilityData)) {
+  sustainabilityData.forEach((item) => {
+    const category = item.category;
+    if (!groupedData[category]) {
+      groupedData[category] = [];
+    }
+
+    const accordions =
+      item.accordions?.map((acc) => ({
+        title: acc.question,
+        content: acc.answer,
+      })) || [];
+
+    if (accordions.length > 0) {
+      groupedData[category].push({
+        title: item.title,
+        items: accordions,
+      });
+    }
+  });
+}
+
+// Define category order and display names
+const categoryInfo = {
+  environment: "Environmental Impact",
+  "waste-management": "Waste Management",
+  energy: "Energy & Resources",
+  transport: "Sustainable Transport",
+  community: "Community Initiatives",
+  general: "General Sustainability",
+};
+---
+
+<Layout title="Sustainability - Hopkins Creek Festival">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold text-center mb-8">Sustainability</h1>
+    <p class="text-lg text-center mb-12 text-gray-600">
+      Our commitment to environmental responsibility and sustainable practices
+    </p>
+
+    {
+      Object.entries(categoryInfo).map(([categoryKey, categoryTitle]) => {
+        const categoryData = groupedData[categoryKey];
+        if (!categoryData || categoryData.length === 0) return null;
+
+        return (
+          <div class="mb-12">
+            <h2 class="text-3xl font-semibold mb-6 text-center">
+              {categoryTitle}
+            </h2>
+            {categoryData.map((section, index) => (
+              <InfoSection
+                title={section.title}
+                items={section.items}
+                groupName={`${categoryKey}-${index}`}
+              />
+            ))}
+          </div>
+        );
+      })
+    }
+  </div>
+</Layout>

@@ -1,0 +1,13 @@
+---
+interface Props {
+  artists: string[];
+}
+const { artists } = Astro.props as Props;
+---
+
+<section id="artists" class="container mx-auto my-16">
+  <h2 class="text-4xl text-center mb-8 font-bold">Lineup</h2>
+  <ul class="text-3xl md:text-5xl text-center list-none p-2 m-2">
+    {artists.map((artist) => <li class="inline-block mr-7 mb-4">{artist}</li>)}
+  </ul>
+</section>

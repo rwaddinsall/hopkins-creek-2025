@@ -1,11 +1,69 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import Gallery from "../components/Gallery.astro";
+import Artists from "../components/Artists/Artists.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Array of artist names
+const artists = [
+  "Aarti Jadu (live)",
+  "Alex Albrecht (live)",
+  "Babyxann",
+  "Birdsnake",
+  "Bumpy",
+  "C.R.A.I.G",
+  "Casey",
+  "Castro & Nemo (GER)",
+  "Chuleo Club",
+  "Colllege of Knowledge",
+  "Cousin (live)",
+  "Darcy Justice",
+  "DITA (IDN)",
+  "DJ Kiti",
+  "DJ No More",
+  "DJ Shio",
+  "Dreems",
+  "Earl Grey",
+  "Emelyne",
+  "Ewan Saturdy",
+  "Folarin",
+  "Handclap (live)",
+  "Hooks Lines and Sinker",
+  "Intermood",
+  "JEEP Sessions",
+  "Katie Pearson",
+  "Keanu Nelson",
+  "Low Flung (live)",
+  "Lunacy",
+  "Magda B",
+  "Maria Moles (live)",
+  "Miki",
+  "Milou Moon",
+  "MiNNA (UK)",
+  "Mitsuki (JAP)",
+  "Myles Mac & DJ Possum",
+  "Noise In My Head",
+  "Nū (live)",
+  "Nuestra Planeta",
+  "Ones",
+  "Optimo (SCT)",
+  "Our Carlson",
+  "Owelu Dreamhouse",
+  "Quality Used Cars",
+  "R.Ribiero",
+  "Ryan Berkeley (live)",
+  "San Of The Rambutan",
+  "Seen.Touch",
+  "Setwun",
+  "Sleep D Live (live)",
+  "Timepoor",
+  "Walter Majik",
+  "Wax Nomads",
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Hopkins Creek">
+  <Hero />
+  <Gallery />
+  <Artists artists={artists} />
 </Layout>

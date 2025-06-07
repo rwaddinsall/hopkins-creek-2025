@@ -1,0 +1,71 @@
+---
+import Layout from "../layouts/Layout.astro";
+import fetchApi from "../lib/strapi";
+
+// Simplified types for actual Strapi data structure
+interface PageHeader {
+  id: number;
+  title: string;
+  subtitle?: string;
+}
+
+interface InfoSection {
+  id: number;
+  sectionTitle: string;
+  sectionDetails: string;
+  sectionId?: string;
+  accordion?: Accordion[];
+}
+
+interface Accordion {
+  id: number;
+  heading: string;
+  details: string;
+  displayOrder?: number;
+}
+
+interface InfoPageData {
+  pageHeader: PageHeader[];
+  infoSections: InfoSection[];
+}
+
+// Fetch info page data from Strapi
+const infoPageData: InfoPageData | null =
+  (await fetchApi({
+    endpoint: "info-page",
+    query: {
+      populate: "*", // Use correct Strapi v5 syntax
+    },
+    wrappedByKey: "data",
+  })) || null;
+---
+
+<Layout title="Info - Hopkins Creek Festival">
+  <div>
+    <!-- Page Header -->
+    {infoPageData?.pageHeader?.[0] && (
+      <div>
+        <h1>{infoPageData.pageHeader[0].title}</h1>
+        {infoPageData.pageHeader[0].subtitle && (
+          <p>{infoPageData.pageHeader[0].subtitle}</p>
+        )}
+      </div>
+    )}
+
+    <!-- Info Sections -->
+    {infoPageData?.infoSections?.map((section) => (
+      <div>
+        <h2>{section.sectionTitle}</h2>
+        <p>{section.sectionDetails}</p>
+        
+        <!-- Accordions if they exist -->
+        {section.accordion?.map((acc) => (
+          <details>
+            <summary>{acc.heading}</summary>
+            <p>{acc.details}</p>
+          </details>
+        ))}
+      </div>
+    ))}
+  </div>
+</Layout>
