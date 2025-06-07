@@ -1,0 +1,50 @@
+---
+import InfoSection from "./Info-section/InfoSection.astro";
+import type { AccordionItem } from "../../types/strapi";
+
+interface InfoCardProps {
+  title: string;
+  description?: string;
+  accordionItems: AccordionItem[];
+  groupName: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  accordionItems,
+  groupName,
+  class: className = "",
+} = Astro.props as InfoCardProps;
+---
+
+<div
+  class={`card bg-base-100 shadow-sm border border-base-300 hover:shadow-xl transition-all duration-300 h-full w-full ${className}`}
+>
+  <div class="card-body p-6">
+    <h2 class="card-title text-xl mb-6 text-primary font-bold">{title}</h2>
+    {
+      description && (
+        <div class="mb-6">
+          <p class="text-base-content/80 leading-relaxed">{description}</p>
+        </div>
+      )
+    }
+    <div class="flex-1">
+      <InfoSection items={accordionItems} groupName={groupName} />
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

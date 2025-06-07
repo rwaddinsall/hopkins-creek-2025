@@ -1,31 +1,34 @@
+---
+const galleryImages = [
+  {
+    src: "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp",
+    alt: "Festival atmosphere",
+  },
+  {
+    src: "https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.webp",
+    alt: "Music performance",
+  },
+  {
+    src: "https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp",
+    alt: "Festival crowd",
+  },
+];
+---
+
 <div class="mx-auto my-16 px-4">
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
-    <div class="card bg-base-100 shadow-sm overflow-hidden">
-      <figure class="aspect-square">
-        <img
-          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-          alt="Festival scene"
-          class="object-cover w-full h-full"
-        />
-      </figure>
-    </div>
-    <div class="card bg-base-100 shadow-sm overflow-hidden">
-      <figure class="aspect-square">
-        <img
-          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-          alt="Festival scene"
-          class="object-cover w-full h-full"
-        />
-      </figure>
-    </div>
-    <div class="card bg-base-100 shadow-sm overflow-hidden">
-      <figure class="aspect-square">
-        <img
-          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-          alt="Festival scene"
-          class="object-cover w-full h-full"
-        />
-      </figure>
-    </div>
+    {
+      galleryImages.map((image) => (
+        <div class="card bg-base-100 shadow-sm overflow-hidden">
+          <figure class="aspect-square">
+            <img
+              src={image.src}
+              alt={image.alt}
+              class="object-cover w-full h-full"
+            />
+          </figure>
+        </div>
+      ))
+    }
   </div>
 </div>

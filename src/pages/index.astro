@@ -3,7 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import Hero from "../components/Hero.astro";
 import Gallery from "../components/Gallery.astro";
 import Artists from "../components/Artists/Artists.astro";
-const artists = [
+
+const fallbackArtists = [
   "Aarti Jadu (live)",
   "Alex Albrecht (live)",
   "Babyxann",
@@ -63,5 +64,5 @@ const artists = [
 <Layout title="Hopkins Creek">
   <Hero />
   <Gallery />
-  <Artists artists={artists} />
+  <Artists fallbackArtists={fallbackArtists} />
 </Layout>

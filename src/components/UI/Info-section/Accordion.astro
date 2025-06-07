@@ -1,9 +1,4 @@
 ---
-import {
-  Accordion as AccessibleAccordion,
-  AccordionItem,
-} from "accessible-astro-components";
-
 interface AccordionItemData {
   title: string;
   content: string;
@@ -22,19 +17,32 @@ const {
   class: className = "",
   openFirst = false,
 } = Astro.props as AccordionProps;
+
+// Ensure unique group name to prevent conflicts with other accordions
+const uniqueGroupName = `${groupName}-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<AccessibleAccordion class={className}>
+<div class={`space-y-3 ${className}`}>
   {
     items.map((item, index) => (
-      <AccordionItem
-        title={item.title}
-        name={groupName}
-        open={openFirst && index === 0}
-        variant="chevron"
-      >
-        <p>{item.content}</p>
-      </AccordionItem>
+      <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-lg shadow-sm">
+        <input
+          type="radio"
+          name={uniqueGroupName}
+          checked={openFirst && index === 0}
+        />
+        <div class="collapse-title text-base font-semibold py-4 px-6">
+          {item.title}
+        </div>
+        <div class="collapse-content">
+          <div class="px-6 pb-4">
+            <div
+              class="prose prose-sm max-w-none text-base-content/90"
+              set:html={item.content}
+            />
+          </div>
+        </div>
+      </div>
     ))
   }
-</AccessibleAccordion>
+</div>

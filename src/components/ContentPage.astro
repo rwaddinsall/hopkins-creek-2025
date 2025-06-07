@@ -1,0 +1,68 @@
+---
+import PageHeader from "./UI/PageHeader.astro";
+import InfoCard from "./UI/InfoCard.astro";
+import GridContainer from "./UI/GridContainer.astro";
+import EmptyState from "./UI/EmptyState.astro";
+import fetchApi from "../lib/strapi";
+import {
+  transformAccordionData,
+  generateGroupName,
+  hasContent,
+} from "../lib/transformers";
+import type {
+  InfoSection as InfoSectionType,
+  PageHeader as PageHeaderType,
+} from "../types/strapi";
+
+interface ContentPageProps {
+  endpoint: string;
+  title: string;
+  emptyMessage: string;
+  sectionsKey: string;
+}
+
+const { endpoint, title, emptyMessage, sectionsKey } =
+  Astro.props as ContentPageProps;
+
+const pageData: any = await fetchApi({
+  endpoint,
+  query: {
+    "populate[pageHeader]": "*",
+    [`populate[${sectionsKey}][populate][accordion]`]: "*",
+  },
+  wrappedByKey: "data",
+});
+
+const pageHeader: PageHeaderType | undefined = pageData?.pageHeader?.[0];
+const sections: InfoSectionType[] = pageData?.[sectionsKey] || [];
+---
+
+<div class="container mx-auto px-4 py-8">
+  {
+    pageHeader && (
+      <PageHeader title={pageHeader.title} subtitle={pageHeader.subtitle} />
+    )
+  }
+  {
+    hasContent(sections) ? (
+      <GridContainer>
+        {sections.map((section, index) => {
+          const accordionItems = transformAccordionData(
+            section.accordion || []
+          );
+          const groupName = generateGroupName("section", section.id, index);
+          return (
+            <InfoCard
+              title={section.sectionTitle}
+              description={section.sectionDetails}
+              accordionItems={accordionItems}
+              groupName={groupName}
+            />
+          );
+        })}
+      </GridContainer>
+    ) : (
+      <EmptyState message={emptyMessage} />
+    )
+  }
+</div>

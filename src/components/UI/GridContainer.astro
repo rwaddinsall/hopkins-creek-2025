@@ -1,0 +1,27 @@
+---
+interface GridContainerProps {
+  class?: string;
+  columns?: {
+    base?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+}
+
+const { class: className = "", columns = { base: 1, md: 1, lg: 1 } } =
+  Astro.props as GridContainerProps;
+
+const gridClasses = [
+  `grid-cols-${columns.base || 1}`,
+  columns.md && `md:grid-cols-${columns.md}`,
+  columns.lg && `lg:grid-cols-${columns.lg}`,
+  columns.xl && `xl:grid-cols-${columns.xl}`,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={`grid ${gridClasses} gap-6 ${className}`}>
+  <slot />
+</div>

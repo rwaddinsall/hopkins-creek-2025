@@ -5,14 +5,6 @@ interface Props {
   wrappedByList?: boolean;
 }
 
-/**
- * Fetches data from the Strapi API
- * @param endpoint - The endpoint to fetch from
- * @param query - The query parameters to add to the url
- * @param wrappedByKey - The key to unwrap the response from
- * @param wrappedByList - If the response is a list, unwrap it
- * @returns
- */
 export default async function fetchApi<T>({
   endpoint,
   query,
@@ -33,9 +25,7 @@ export default async function fetchApi<T>({
   
   const res = await fetch(url.toString());
   
-  // Check if the response is ok (status 200-299)
   if (!res.ok) {
-    // For 404 errors on API endpoints, return empty data instead of throwing
     if (res.status === 404) {
       console.warn(`Strapi API returned 404 for ${endpoint} - returning empty data`);
       return (wrappedByList ? [] : null) as T;
@@ -45,7 +35,6 @@ export default async function fetchApi<T>({
   
   let data = await res.json();
 
-  // Check for Strapi error format
   if (data.error) {
     throw new Error(`Strapi error: ${data.error.message}`);
   }
@@ -61,17 +50,26 @@ export default async function fetchApi<T>({
   return data as T;
 }
 
-export async function fetchStrapiData(endpoint: string) {
+export async function fetchArtists() {
   try {
-    // Build full Strapi API URL using server-side STRAPI_URL env var
-    const apiUrl = new URL(`${import.meta.env.STRAPI_URL}/api/${endpoint}`);
-    const response = await fetch(apiUrl.toString());
+    // Add pagination limit to get all artists
+    const response = await fetch(`${import.meta.env.STRAPI_URL}/api/artists?sort=name:asc&pagination[limit]=100`);
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch data from Strapi: ${response.statusText}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return await response.json();
+    
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error('Error fetching artists:', error);
+    throw error;
   }
+}
+
+export function formatArtistName(artist: import('../types/strapi').Artist): string {
+  let name = artist.name;
+  if (artist.isLive) name += " (live)";
+  if (artist.country) name += ` (${artist.country})`;
+  return name;
 }

@@ -1,0 +1,22 @@
+---
+interface EmptyStateProps {
+  title?: string;
+  message: string;
+  class?: string;
+}
+
+const {
+  title,
+  message,
+  class: className = "",
+} = Astro.props as EmptyStateProps;
+---
+
+<div class={`text-center py-12 ${className}`}>
+  {
+    title && (
+      <h2 class="text-2xl font-semibold mb-4 text-base-content/80">{title}</h2>
+    )
+  }
+  <p class="text-lg text-base-content/60">{message}</p>
+</div>

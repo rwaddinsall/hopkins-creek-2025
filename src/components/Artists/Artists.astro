@@ -1,13 +1,73 @@
 ---
+import { fetchArtists, formatArtistName } from "../../lib/strapi";
+import type { Artist } from "../../types/strapi";
+
 interface Props {
-  artists: string[];
+  fallbackArtists?: string[];
 }
-const { artists } = Astro.props as Props;
+
+const { fallbackArtists = [] } = Astro.props as Props;
+
+// Fetch artists from Strapi, with fallback to props
+let artists: Artist[] = [];
+let displayArtists: string[] = fallbackArtists;
+
+try {
+  const artistsResponse = await fetchArtists();
+  if (artistsResponse?.data?.length > 0) {
+    artists = artistsResponse.data;
+    displayArtists = artists.map(formatArtistName);
+  }
+} catch (error) {
+  console.warn("Failed to fetch artists from Strapi, using fallback:", error);
+}
+
+// Helper function to create artist URL slug
+function createArtistSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .trim();
+}
 ---
 
 <section id="artists" class="container mx-auto my-16">
-  <h2 class="text-4xl text-center mb-8 font-bold">Lineup</h2>
-  <ul class="text-3xl md:text-5xl text-center list-none p-2 m-2">
-    {artists.map((artist) => <li class="inline-block mr-7 mb-4">{artist}</li>)}
+  <h2 class="text-6xl text-center mb-8 font-bold">Who's Playing?</h2>
+  <ul class="text-3xl md:text-5xl text-center list-none p-2 m-2" role="list">
+    {
+      artists.length > 0
+        ? artists.map((artist) => {
+            const artistSlug = createArtistSlug(artist.name);
+            const formattedName = formatArtistName(artist);
+            return (
+              <li class="inline-block mr-5 mb-6">
+                <a
+                  href={`/artists/${artistSlug}`}
+                  class="inline-block transition-all duration-300 ease-in-out hover:text-primary focus:text-primary   focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md px-2 py-1"
+                  aria-label={`View details for ${artist.name}${artist.isLive ? " (live performance)" : ""}${artist.country ? ` from ${artist.country}` : ""}`}
+                  tabindex="0"
+                >
+                  {formattedName}
+                </a>
+              </li>
+            );
+          })
+        : displayArtists.map((artistName) => {
+            const artistSlug = createArtistSlug(artistName);
+            return (
+              <li class="inline-block mr-4 mb-3">
+                <a
+                  href={`/artists/${artistSlug}`}
+                  class="inline-block transition-all duration-300 ease-in-out hover:text-primary hover:scale-105 focus:text-primary focus:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md px-2 py-1"
+                  aria-label={`View details for ${artistName}`}
+                  tabindex="0"
+                >
+                  {artistName}
+                </a>
+              </li>
+            );
+          })
+    }
   </ul>
 </section>
