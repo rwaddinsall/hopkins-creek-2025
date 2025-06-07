@@ -1,33 +1,40 @@
 ---
-interface AccordionItem {
+import {
+  Accordion as AccessibleAccordion,
+  AccordionItem,
+} from "accessible-astro-components";
+
+interface AccordionItemData {
   title: string;
   content: string;
 }
 
 interface AccordionProps {
-  items?: AccordionItem[];
+  items?: AccordionItemData[];
   groupName?: string;
-  className?: string;
+  class?: string;
+  openFirst?: boolean;
 }
 
 const {
   items = [],
-  groupName = "accordion",
-  className = "",
+  groupName = "accordion-group",
+  class: className = "",
+  openFirst = false,
 } = Astro.props as AccordionProps;
 ---
 
-<!-- Updated DaisyUI v5 Accordion using joined vertical pattern -->
-<div class={`join join-vertical w-full bg-base-100 ${className}`}>
+<AccessibleAccordion class={className}>
   {
-    items.map((item, idx) => (
-      <div class="collapse collapse-arrow join-item border-base-300 border">
-        <input type="radio" name={groupName} checked={idx === 0} />
-        <div class="collapse-title text-lg font-semibold">{item.title}</div>
-        <div class="collapse-content">
-          <p class="text-base">{item.content}</p>
-        </div>
-      </div>
+    items.map((item, index) => (
+      <AccordionItem
+        title={item.title}
+        name={groupName}
+        open={openFirst && index === 0}
+        variant="chevron"
+      >
+        <p>{item.content}</p>
+      </AccordionItem>
     ))
   }
-</div>
+</AccessibleAccordion>

@@ -7,14 +7,12 @@ const pages = [
 ];
 ---
 
-<!-- Skip link for improved keyboard navigation -->
 <a href="#main-content" class="sr-only focus:not-sr-only"
   >Skip to main content</a
 >
 
 <header id="main-navigation" class="py-4">
   <div class="container mx-auto flex items-center justify-between px-4">
-    <!-- Logo -->
     <a
       href="/"
       class="btn btn-ghost normal-case text-xl"
@@ -23,7 +21,6 @@ const pages = [
       Hopkins Creek
     </a>
 
-    <!-- Desktop navigation -->
     <nav class="hidden lg:block" aria-label="Main navigation desktop">
       <ul class="menu menu-horizontal space-x-4">
         {
@@ -38,7 +35,6 @@ const pages = [
       </ul>
     </nav>
 
-    <!-- Mobile menu toggle -->
     <button
       class="btn btn-ghost lg:hidden responsive-toggle"
       aria-expanded="false"
@@ -61,7 +57,6 @@ const pages = [
     </button>
   </div>
 
-  <!-- Mobile navigation -->
   <nav class="mobile-menu hidden lg:hidden" aria-label="Main navigation mobile">
     <ul class="menu menu-vertical space-y-2 p-4">
       {

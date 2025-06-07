@@ -1,8 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import InfoSection from "../components/UI/Info-section/InfoSection.astro";
 import fetchApi from "../lib/strapi";
 
-// Simplified types for actual Strapi data structure
 interface PageHeader {
   id: number;
   title: string;
@@ -28,44 +28,87 @@ interface InfoPageData {
   pageHeader: PageHeader[];
   infoSections: InfoSection[];
 }
-
-// Fetch info page data from Strapi
-const infoPageData: InfoPageData | null =
-  (await fetchApi({
-    endpoint: "info-page",
-    query: {
-      populate: "*", // Use correct Strapi v5 syntax
-    },
-    wrappedByKey: "data",
-  })) || null;
+const infoPageData: InfoPageData | null = await fetchApi({
+  endpoint: "info-page",
+  query: {
+    "populate[pageHeader]": "*",
+    "populate[infoSections][populate][accordion]": "*",
+  },
+  wrappedByKey: "data",
+});
 ---
 
 <Layout title="Info - Hopkins Creek Festival">
-  <div>
-    <!-- Page Header -->
-    {infoPageData?.pageHeader?.[0] && (
-      <div>
-        <h1>{infoPageData.pageHeader[0].title}</h1>
-        {infoPageData.pageHeader[0].subtitle && (
-          <p>{infoPageData.pageHeader[0].subtitle}</p>
-        )}
-      </div>
-    )}
+  <div class="container mx-auto px-4 py-8">
+    {
+      infoPageData?.pageHeader?.[0] && (
+        <div class="text-center mb-8">
+          <h1 class="text-4xl font-bold mb-4">
+            {infoPageData.pageHeader[0].title}
+          </h1>
+          {infoPageData.pageHeader[0].subtitle && (
+            <p class="text-xl text-base-content/70">
+              {infoPageData.pageHeader[0].subtitle}
+            </p>
+          )}
+        </div>
+      )
+    }
 
-    <!-- Info Sections -->
-    {infoPageData?.infoSections?.map((section) => (
-      <div>
-        <h2>{section.sectionTitle}</h2>
-        <p>{section.sectionDetails}</p>
-        
-        <!-- Accordions if they exist -->
-        {section.accordion?.map((acc) => (
-          <details>
-            <summary>{acc.heading}</summary>
-            <p>{acc.details}</p>
-          </details>
-        ))}
-      </div>
-    ))}
+    {
+      infoPageData?.infoSections && infoPageData.infoSections.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {infoPageData.infoSections.map((section, index) => {
+            const accordionItems =
+              section.accordion?.map((acc) => ({
+                title: acc.heading,
+                content: acc.details,
+              })) || [];
+
+            return (
+              <div class="card bg-base-100 shadow-lg border border-base-300 hover:shadow-xl transition-shadow">
+                <div class="card-body">
+                  <h2 class="card-title text-xl mb-4 text-primary">
+                    {section.sectionTitle}
+                  </h2>
+                  {section.sectionDetails && (
+                    <p class="text-base-content/70 mb-4">
+                      {section.sectionDetails}
+                    </p>
+                  )}
+                  <InfoSection
+                    items={accordionItems}
+                    groupName={`section-${section.id || index}`}
+                    class="flex-1"
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-lg text-base-content/60">
+            No information sections available at this time.
+          </p>
+        </div>
+      )
+    }
   </div>
 </Layout>
+
+<style>
+  .card {
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

@@ -3,78 +3,116 @@ import Layout from "../layouts/Layout.astro";
 import InfoSection from "../components/UI/Info-section/InfoSection.astro";
 import fetchApi from "../lib/strapi";
 
-// Fetch sustainability data from Strapi
-const sustainabilityData = await fetchApi({
-  endpoint: "sustainabilities",
+interface PageHeader {
+  id: number;
+  title: string;
+  subtitle?: string;
+}
+
+interface SustainabilitySection {
+  id: number;
+  sectionTitle: string;
+  sectionDetails: string;
+  sectionId?: string;
+  accordion?: Accordion[];
+}
+
+interface Accordion {
+  id: number;
+  heading: string;
+  details: string;
+  displayOrder?: number;
+}
+
+interface SustainabilityPageData {
+  pageHeader: PageHeader[];
+  sustainabilitySections: SustainabilitySection[];
+}
+
+const sustainabilityPageData: SustainabilityPageData | null = await fetchApi({
+  endpoint: "sustainability-page",
   query: {
-    populate: "accordions",
-    sort: "order:asc",
+    "populate[pageHeader]": "*",
+    "populate[sustainabilitySections][populate][accordion]": "*",
   },
   wrappedByKey: "data",
 });
-
-// Group data by category
-const groupedData = {};
-if (sustainabilityData && Array.isArray(sustainabilityData)) {
-  sustainabilityData.forEach((item) => {
-    const category = item.category;
-    if (!groupedData[category]) {
-      groupedData[category] = [];
-    }
-
-    const accordions =
-      item.accordions?.map((acc) => ({
-        title: acc.question,
-        content: acc.answer,
-      })) || [];
-
-    if (accordions.length > 0) {
-      groupedData[category].push({
-        title: item.title,
-        items: accordions,
-      });
-    }
-  });
-}
-
-// Define category order and display names
-const categoryInfo = {
-  environment: "Environmental Impact",
-  "waste-management": "Waste Management",
-  energy: "Energy & Resources",
-  transport: "Sustainable Transport",
-  community: "Community Initiatives",
-  general: "General Sustainability",
-};
 ---
 
 <Layout title="Sustainability - Hopkins Creek Festival">
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-4xl font-bold text-center mb-8">Sustainability</h1>
-    <p class="text-lg text-center mb-12 text-gray-600">
-      Our commitment to environmental responsibility and sustainable practices
-    </p>
+  <div class="container mx-auto px-4 py-8">
+    {
+      sustainabilityPageData?.pageHeader?.[0] && (
+        <div class="text-center mb-8">
+          <h1 class="text-4xl font-bold mb-4">
+            {sustainabilityPageData.pageHeader[0].title}
+          </h1>
+          {sustainabilityPageData.pageHeader[0].subtitle && (
+            <p class="text-xl text-base-content/70">
+              {sustainabilityPageData.pageHeader[0].subtitle}
+            </p>
+          )}
+        </div>
+      )
+    }
 
     {
-      Object.entries(categoryInfo).map(([categoryKey, categoryTitle]) => {
-        const categoryData = groupedData[categoryKey];
-        if (!categoryData || categoryData.length === 0) return null;
+      sustainabilityPageData?.sustainabilitySections &&
+      sustainabilityPageData.sustainabilitySections.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sustainabilityPageData.sustainabilitySections.map(
+            (section, index) => {
+              const accordionItems =
+                section.accordion?.map((acc) => ({
+                  title: acc.heading,
+                  content: acc.details,
+                })) || [];
 
-        return (
-          <div class="mb-12">
-            <h2 class="text-3xl font-semibold mb-6 text-center">
-              {categoryTitle}
-            </h2>
-            {categoryData.map((section, index) => (
-              <InfoSection
-                title={section.title}
-                items={section.items}
-                groupName={`${categoryKey}-${index}`}
-              />
-            ))}
-          </div>
-        );
-      })
+              return (
+                <div class="card bg-base-100 shadow-lg border border-base-300 hover:shadow-xl transition-shadow">
+                  <div class="card-body">
+                    <h2 class="card-title text-xl mb-4 text-primary">
+                      {section.sectionTitle}
+                    </h2>
+                    {section.sectionDetails && (
+                      <p class="text-base-content/70 mb-4">
+                        {section.sectionDetails}
+                      </p>
+                    )}
+                    <InfoSection
+                      items={accordionItems}
+                      groupName={`section-${section.id || index}`}
+                      class="flex-1"
+                    />
+                  </div>
+                </div>
+              );
+            }
+          )}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-lg text-base-content/60">
+            No sustainability information available at this time.
+          </p>
+        </div>
+      )
     }
   </div>
 </Layout>
+
+<style>
+  .card {
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
